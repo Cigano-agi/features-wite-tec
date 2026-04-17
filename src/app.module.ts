@@ -1,22 +1,40 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as Joi from 'joi';
+import { PrismaModule } from './shared/prisma/prisma.module';
+import { AuthModule } from './shared/auth/auth.module';
 import { BillingLinksModule } from './billing-links/billing-links.module';
 import { PublicChargeModule } from './public-charge/public-charge.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { BillingLink } from './billing-links/billing-link.entity';
 import { CorrelationIdMiddleware } from './shared/correlation/correlation-id.middleware';
 import { RateLimiterMiddleware } from './shared/rate-limit/rate-limiter.middleware';
-import { PrismaModule } from './shared/prisma/prisma.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        DATABASE_URL: Joi.string().required(),
+        REDIS_URL: Joi.string().default('redis://localhost:6379'),
+        JWT_SECRET: Joi.string().required(),
+        DOTNET_SERVICE_URL: Joi.string().default('http://localhost:5001'),
+        PUBLIC_CHARGE_DEFAULT_EMAIL: Joi.string().email().default('noreply@witetec.com'),
+        PUBLIC_CHARGE_DEFAULT_PHONE: Joi.string().default('+5500000000000'),
+        RATE_LIMIT_PER_MINUTE: Joi.number().integer().default(30),
+        IDEMPOTENCY_TTL_SECONDS: Joi.number().integer().default(86400),
+        PORT: Joi.number().integer().default(3000),
+      }),
+    }),
+    PrismaModule,
+    AuthModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/witetec',
+      url: process.env.DATABASE_URL,
       entities: [BillingLink],
       synchronize: false,
     }),
-    PrismaModule,
     BillingLinksModule,
     PublicChargeModule,
     MetricsModule,
