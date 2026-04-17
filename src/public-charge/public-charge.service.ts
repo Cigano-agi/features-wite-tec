@@ -5,7 +5,7 @@ import { PiiSanitizer } from '../shared/pii/pii-sanitizer';
 import { PublicChargeDto } from './dto/public-charge.dto';
 import axios from 'axios';
 
-interface ChargeResult {
+export interface ChargeResult {
   transaction_id: string;
   status: string;
   amount: number;

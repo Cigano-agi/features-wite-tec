@@ -22,7 +22,7 @@ import { RateLimiterMiddleware } from './shared/rate-limit/rate-limiter.middlewa
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+    consumer.apply(CorrelationIdMiddleware).forRoutes('{*splat}');
     consumer.apply(RateLimiterMiddleware).forRoutes('v1/public/charge/:linkId');
   }
 }
