@@ -4,6 +4,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>WitetecBillingService</RootNamespace>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
@@ -11,5 +13,13 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Wite.Core.Domain.Contracts\Wite.Core.Domain.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Wite.Core.Domain.Contracts\**" />
+    <EmbeddedResource Remove="Wite.Core.Domain.Contracts\**" />
+    <None Remove="Wite.Core.Domain.Contracts\**" />
   </ItemGroup>
 </Project>
