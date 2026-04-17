@@ -6,16 +6,17 @@ import { PublicChargeService } from './public-charge.service';
 import { BillingLinksService } from '../billing-links/billing-links.service';
 import { IdempotencyService } from '../shared/idempotency/idempotency.service';
 import { ConfigService } from '@nestjs/config';
-import { BillingLink } from '../billing-links/billing-link.entity';
+import type { BillingLink } from '@prisma/client';
 
-const makeLink = (): BillingLink =>
-  Object.assign(new BillingLink(), {
-    id: 'link-uuid-1',
-    sellerId: 'seller-uuid-1',
-    amount: 10000,
-    description: 'Test product',
-    status: 'active' as const,
-  });
+const makeLink = (): BillingLink => ({
+  id: 'link-uuid-1',
+  sellerId: 'seller-uuid-1',
+  amount: 10000,
+  description: 'Test product',
+  status: 'active',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+} as BillingLink);
 
 const IDEMPOTENCY_KEY = 'idem-key-abc';
 const CORRELATION_ID = 'corr-id-xyz';
