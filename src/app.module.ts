@@ -6,6 +6,7 @@ import { MetricsModule } from './metrics/metrics.module';
 import { BillingLink } from './billing-links/billing-link.entity';
 import { CorrelationIdMiddleware } from './shared/correlation/correlation-id.middleware';
 import { RateLimiterMiddleware } from './shared/rate-limit/rate-limiter.middleware';
+import { PrismaModule } from './shared/prisma/prisma.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { RateLimiterMiddleware } from './shared/rate-limit/rate-limiter.middlewa
       entities: [BillingLink],
       synchronize: false,
     }),
+    PrismaModule,
     BillingLinksModule,
     PublicChargeModule,
     MetricsModule,
