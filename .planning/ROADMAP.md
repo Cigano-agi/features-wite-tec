@@ -32,10 +32,10 @@ This roadmap takes the Billing Links PoC from a functional proof-of-concept to a
   4. The PR pipeline (.github/workflows/pull_request.yaml) runs automatically on every pull request
   5. The production deploy pipeline (.github/workflows/aws_prod.yml) exists and is configured
 **Plans**: 4 plans
-- [ ] 01-01-PLAN.md — NestJS 11 upgrade + monorepo restructure (move node-api/ to root, fix wildcard route)
-- [ ] 01-02-PLAN.md — Prisma 6.19 install + introspect billing_links + PrismaService global module + [BLOCKING] db push
-- [ ] 01-03-PLAN.md — DI replacements: @nestjs/config + pure CanActivate JWT guard + @nestjs/axios HttpModule (removes Passport, 7 process.env reads)
-- [ ] 01-04-PLAN.md — TypeORM removal + BillingLinksService ported to Prisma + GitHub Actions PR/prod workflows + Dockerfile
+- [x] 01-01-PLAN.md — NestJS 11 upgrade + monorepo restructure (move node-api/ to root, fix wildcard route)
+- [x] 01-02-PLAN.md — Prisma 6.19 install + introspect billing_links + PrismaService global module + [BLOCKING] db push
+- [x] 01-03-PLAN.md — DI replacements: @nestjs/config + pure CanActivate JWT guard + @nestjs/axios HttpModule (removes Passport, 7 process.env reads)
+- [x] 01-04-PLAN.md — TypeORM removal + BillingLinksService ported to Prisma + GitHub Actions PR/prod workflows + Dockerfile
 
 ### Phase 2: Shared Infrastructure
 **Goal**: All shared building blocks are operational — Prisma and Redis singletons, PiiSanitizer enforced globally, CorrelationId on every request, OpenTelemetry traces flowing, rate limiting active, .NET persisting to PostgreSQL via EF Core, and PspModule as the sole HTTP adapter to .NET
