@@ -1,0 +1,16 @@
+node_modules
+dist
+.git
+.github
+.planning
+.env
+.env.local
+*.log
+coverage
+dotnet-service
+dotnet-service-tests
+frontend
+specs
+db
+README.md
+CLAUDE.md
