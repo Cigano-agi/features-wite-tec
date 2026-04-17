@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using WitetecBillingService.API.Middleware;
 using WitetecBillingService.Application.Interfaces;
@@ -14,7 +15,13 @@ builder.Host.UseSerilog();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSingleton<ITransactionRepository, InMemoryTransactionRepository>();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is required");
+
+builder.Services.AddDbContext<BillingDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<ITransactionRepository, EfTransactionRepository>();
 builder.Services.AddScoped<CreateTransactionUseCase>();
 
 var app = builder.Build();
