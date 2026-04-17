@@ -850,22 +850,16 @@ Seven locations of raw `process.env` access confirmed by code review — all mus
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **What is the AWS deployment target?**
-   - What we know: Project has `aws_prod.yml` as the required filename (AVAIL-05); AWS SQS is used for webhooks (Phase 6); ECS is the most common NestJS container hosting target on AWS.
-   - What's unclear: The project files contain no reference to ECS, Lambda, EC2, or any existing AWS infrastructure.
-   - Recommendation: Confirm with team before finalizing `aws_prod.yml`. ECS is the default assumption (documented in RESEARCH). If EC2, the workflow differs significantly (SSH deploy instead of task definition update).
+   - RESOLVED: Plans assume ECS (documented in 01-04 Plan, Task 3). Developer must confirm and create ECR/ECS resources as a follow-up before first deploy.
 
 2. **Does a Dockerfile exist?**
-   - What we know: No `.github/` directory and no `Dockerfile` found in the project root or `node-api/`.
-   - What's unclear: Whether the prod pipeline should include Dockerfile creation in Phase 1 or whether one exists elsewhere.
-   - Recommendation: Phase 1 plan should include creating a `Dockerfile` for the NestJS app at the monorepo root as a prerequisite to the GitHub Actions AWS pipeline.
+   - RESOLVED: No Dockerfile exists. Plan 01-04 Task 3 creates a multi-stage Dockerfile at the monorepo root.
 
 3. **Where does `node-api/package.json` move in the monorepo?**
-   - What we know: The target structure places NestJS source at the monorepo root (`src/`). The `package.json` can either stay in `node-api/` (keeping the subdirectory) or move to root.
-   - What's unclear: The REQUIREMENTS/ROADMAP say "monorepo src/modules structure" but don't specify whether `node-api/` subdirectory is preserved.
-   - Recommendation: Move `package.json` to the monorepo root to match the `src/` placement. The `node-api/` directory disappears entirely. `frontend/` stays as a sibling at root. `services/dotnet-psp/` replaces `dotnet-service/`.
+   - RESOLVED: Plan 01-01 Task 1 moves `package.json` to the monorepo root. `node-api/` directory disappears entirely. `frontend/` and `dotnet-service/` remain as sibling directories.
 
 ---
 
