@@ -31,7 +31,11 @@ This roadmap takes the Billing Links PoC from a functional proof-of-concept to a
   3. All three legacy directories are merged into a single monorepo with src/modules layout
   4. The PR pipeline (.github/workflows/pull_request.yaml) runs automatically on every pull request
   5. The production deploy pipeline (.github/workflows/aws_prod.yml) exists and is configured
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 01-01-PLAN.md — NestJS 11 upgrade + monorepo restructure (move node-api/ to root, fix wildcard route)
+- [ ] 01-02-PLAN.md — Prisma 6.19 install + introspect billing_links + PrismaService global module + [BLOCKING] db push
+- [ ] 01-03-PLAN.md — DI replacements: @nestjs/config + pure CanActivate JWT guard + @nestjs/axios HttpModule (removes Passport, 7 process.env reads)
+- [ ] 01-04-PLAN.md — TypeORM removal + BillingLinksService ported to Prisma + GitHub Actions PR/prod workflows + Dockerfile
 
 ### Phase 2: Shared Infrastructure
 **Goal**: All shared building blocks are operational — Prisma and Redis singletons, PiiSanitizer enforced globally, CorrelationId on every request, OpenTelemetry traces flowing, rate limiting active, .NET persisting to PostgreSQL via EF Core, and PspModule as the sole HTTP adapter to .NET
@@ -128,7 +132,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Monorepo Scaffold | 0/TBD | Not started | - |
+| 1. Monorepo Scaffold | 0/4 | Not started | - |
 | 2. Shared Infrastructure | 0/TBD | Not started | - |
 | 3. Auth & BillingLink CRUD | 0/TBD | Not started | - |
 | 4. Public Charge Flow | 0/TBD | Not started | - |
