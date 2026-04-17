@@ -1,4 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response, NextFunction } from 'express';
 import Redis from 'ioredis';
 
@@ -10,9 +11,10 @@ export class RateLimiterMiddleware implements NestMiddleware {
   private readonly redis: Redis;
   private readonly limit: number;
 
-  constructor() {
-    this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379');
-    this.limit = parseInt(process.env.RATE_LIMIT_PER_MINUTE ?? '30', 10);
+  constructor(private readonly configService: ConfigService) {
+    const redisUrl = this.configService.get<string>('REDIS_URL') ?? 'redis://localhost:6379';
+    this.redis = new Redis(redisUrl);
+    this.limit = this.configService.get<number>('RATE_LIMIT_PER_MINUTE') ?? 30;
   }
 
   async use(req: Request, res: Response, next: NextFunction) {

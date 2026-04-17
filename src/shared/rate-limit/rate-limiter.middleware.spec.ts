@@ -18,13 +18,20 @@ const mockRes = () => {
   return res;
 };
 
+const configStub = {
+  get: jest.fn((key: string) => {
+    if (key === 'REDIS_URL') return 'redis://localhost:6379';
+    if (key === 'RATE_LIMIT_PER_MINUTE') return 30;
+    return undefined;
+  }),
+} as any;
+
 describe('RateLimiterMiddleware', () => {
   let middleware: RateLimiterMiddleware;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.RATE_LIMIT_PER_MINUTE = '30';
-    middleware = new RateLimiterMiddleware();
+    middleware = new RateLimiterMiddleware(configStub);
   });
 
   it('allows request below limit', async () => {

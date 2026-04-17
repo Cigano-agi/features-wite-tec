@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { firstValueFrom } from 'rxjs';
 import { BillingLinksService } from '../billing-links/billing-links.service';
 import { IdempotencyService } from '../shared/idempotency/idempotency.service';
 import { PiiSanitizer } from '../shared/pii/pii-sanitizer';
 import { PublicChargeDto } from './dto/public-charge.dto';
-import axios from 'axios';
 
 export interface ChargeResult {
   transaction_id: string;
@@ -15,17 +17,17 @@ export interface ChargeResult {
 
 @Injectable()
 export class PublicChargeService {
-  private readonly dotnetServiceUrl: string;
   private readonly defaultEmail: string;
   private readonly defaultPhone: string;
 
   constructor(
     private readonly billingLinksService: BillingLinksService,
     private readonly idempotencyService: IdempotencyService,
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
   ) {
-    this.dotnetServiceUrl = process.env.DOTNET_SERVICE_URL ?? 'http://localhost:5001';
-    this.defaultEmail = process.env.PUBLIC_CHARGE_DEFAULT_EMAIL ?? 'noreply@witetec.com';
-    this.defaultPhone = process.env.PUBLIC_CHARGE_DEFAULT_PHONE ?? '+5500000000000';
+    this.defaultEmail = this.configService.get<string>('PUBLIC_CHARGE_DEFAULT_EMAIL') ?? 'noreply@witetec.com';
+    this.defaultPhone = this.configService.get<string>('PUBLIC_CHARGE_DEFAULT_PHONE') ?? '+5500000000000';
   }
 
   async charge(linkId: string, dto: PublicChargeDto, idempotencyKey: string, correlationId: string): Promise<ChargeResult> {
@@ -34,10 +36,9 @@ export class PublicChargeService {
       throw new NotFoundException('billing_link_not_found_or_inactive');
     }
 
-    // Check idempotency before processing
     const existing = await this.idempotencyService.exists(idempotencyKey);
     if (existing) {
-      return { ...existing as any, idempotent: true };
+      return { ...(existing as any), idempotent: true };
     }
 
     const payload = {
@@ -53,14 +54,14 @@ export class PublicChargeService {
     let txResponse: { transactionId: string; status: string; amount: number };
 
     try {
-      const response = await axios.post(`${this.dotnetServiceUrl}/internal/transactions`, payload, {
-        timeout: 10000,
-        headers: { 'x-correlation-id': correlationId },
-      });
+      const response = await firstValueFrom(
+        this.httpService.post('/internal/transactions', payload, {
+          headers: { 'x-correlation-id': correlationId },
+        }),
+      );
       txResponse = response.data;
     } catch (err: any) {
-      const safeBody = PiiSanitizer.safeBody(payload as any);
-      const message = err?.message ?? 'unknown';
+      PiiSanitizer.safeBody(payload as any);
       throw new HttpException(
         { error: 'payment_processor_unavailable', correlationId },
         HttpStatus.SERVICE_UNAVAILABLE,
@@ -74,9 +75,7 @@ export class PublicChargeService {
       billing_link_id: link.id,
     };
 
-    // Persist idempotency key after successful transaction
     await this.idempotencyService.save(idempotencyKey, result as any);
-
     return result;
   }
 }

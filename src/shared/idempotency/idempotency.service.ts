@@ -1,4 +1,5 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 const IDEMPOTENCY_PREFIX = 'idempotency:charge:';
@@ -8,9 +9,10 @@ export class IdempotencyService implements OnModuleDestroy {
   private readonly redis: Redis;
   private readonly ttlSeconds: number;
 
-  constructor() {
-    this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379');
-    this.ttlSeconds = parseInt(process.env.IDEMPOTENCY_TTL_SECONDS ?? '86400', 10);
+  constructor(private readonly configService: ConfigService) {
+    const redisUrl = this.configService.get<string>('REDIS_URL') ?? 'redis://localhost:6379';
+    this.redis = new Redis(redisUrl);
+    this.ttlSeconds = this.configService.get<number>('IDEMPOTENCY_TTL_SECONDS') ?? 86400;
   }
 
   async onModuleDestroy() {

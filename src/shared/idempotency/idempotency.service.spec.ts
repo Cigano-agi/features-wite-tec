@@ -11,12 +11,20 @@ jest.mock('ioredis', () => {
   return { __esModule: true, default: MockRedis };
 });
 
+const configStub = {
+  get: jest.fn((key: string) => {
+    if (key === 'REDIS_URL') return 'redis://localhost:6379';
+    if (key === 'IDEMPOTENCY_TTL_SECONDS') return 86400;
+    return undefined;
+  }),
+} as any;
+
 describe('IdempotencyService', () => {
   let service: IdempotencyService;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new IdempotencyService();
+    service = new IdempotencyService(configStub);
   });
 
   describe('checkOrSave', () => {
